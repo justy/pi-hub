@@ -39,103 +39,29 @@
 // Play a cheesy wedding tune
 #define PIN_BridalMarch 22//3,15
 
-// Lights and noises so far, but what about some motorised action?
+// Lights and noises so far, but what about some motorised action?`
 #define PIN_Motor 23//4,16
 
 
 int main ()
 {
-int i ;
-int r = 0;
-int g = 0;
-int b = 0;
-
-if (wiringPiSetupGpio () < 0)
-{
-fprintf (stderr, "Unable to setup GPIO: %s\n", strerror (errno)) ;
-return 1 ;
-}
-
-softPwmCreate (PIN_Eye1_R, 0, 100) ;
-softPwmCreate (PIN_Eye1_G, 0, 100) ;
-softPwmCreate (PIN_Eye1_B, 0, 100) ;
-softPwmCreate (PIN_Eye2_R, 0, 100) ;
-softPwmCreate (PIN_Eye2_G, 0, 100) ;
-softPwmCreate (PIN_Eye2_B, 0, 100) ;
-
-softPwmWrite (PIN_Eye1_R, 100) ;
-softPwmWrite (PIN_Eye1_G, 100) ;
-softPwmWrite (PIN_Eye1_B, 100) ;
-softPwmWrite (PIN_Eye2_R, 100) ;
-softPwmWrite (PIN_Eye2_G, 100) ;
-softPwmWrite (PIN_Eye2_B, 100) ;
-
-#define big_delay 100
-
-softPwmWrite(PIN_Eye1_R, 0); delay(big_delay);
-softPwmWrite(PIN_Eye1_R, 100); delay(big_delay);
-softPwmWrite(PIN_Eye1_G, 0); delay(big_delay);
-softPwmWrite(PIN_Eye1_G, 100); delay(big_delay);
-softPwmWrite(PIN_Eye1_B, 0); delay(big_delay);
-softPwmWrite(PIN_Eye1_B, 100); delay(big_delay);
-
-softPwmWrite(PIN_Eye2_R, 0); delay(big_delay);
-softPwmWrite(PIN_Eye2_R, 100); delay(big_delay);
-softPwmWrite(PIN_Eye2_G, 0); delay(big_delay);
-softPwmWrite(PIN_Eye2_G, 100); delay(big_delay);
-softPwmWrite(PIN_Eye2_B, 0); delay(big_delay);
-softPwmWrite(PIN_Eye2_B, 100); delay(big_delay);
-
-for (;;)
-{
-  r+=10;
-  if (r > 100) {
-    r = 0;
-    g+=10;
-    if (g > 100) {
-      g = 0;
-      b+=10;
-      if (b > 100) {
-        b = 0;
-      }
-    }
-  }
-//for (i = 0 ; i <= 100 ; ++i)
-//{
-softPwmWrite (PIN_Eye1_R, r) ;
-softPwmWrite (PIN_Eye1_G, g) ;
-softPwmWrite (PIN_Eye1_B, b) ;
-softPwmWrite (PIN_Eye2_R, 100-r) ;
-softPwmWrite (PIN_Eye2_G, 100-g) ;
-softPwmWrite (PIN_Eye2_B, 100-b) ;
-
-//delay (10) ;
-//}
-//delay (50) ;
-
-/*
-for (i = 100 ; i >= 0 ; --i)
-{
-  softPwmWrite (PIN_Eye1_R, (i+r)%100) ;
-  softPwmWrite (PIN_Eye1_G, (i+g)%100) ;
-  softPwmWrite (PIN_Eye1_B, i) ;
-  softPwmWrite (PIN_Eye2_R, (i+r)%100) ;
-  softPwmWrite (PIN_Eye2_G, (i+g)%100) ;
-  softPwmWrite (PIN_Eye2_B, i) ;
-
-delay (10) ;
-}
-*/
-delay(10);
-}
-
+  initRGBLEDs();
+  
+  // ?? I still don't know how this is done from the perspective of a RPi...
+  
+  // Listen for events from the block
+  
 
 }
 
+
+/////////////////////////////////////
 // LED control
 // I've used common-anode LEDs and thus to turn an LED on I need to set its 
 // various pin's levels to low values.  For sanity's sake I reverse this
-// relationship in these functions.
+// relationship in these functions
+
+
 // The other bit of business here is some LED component level attenuation.
 // My LEDs' green is rather overpowering and so there is provision here to
 // set maximum levels per colour component.  We still call setRed, setGreen, etc with desired percentage values:
@@ -146,26 +72,100 @@ delay(10);
 #define BLU_Max 100 
 
 void initRGBLEDs() {
-  softPwmCreate (PIN_Eye1_R, 0, 100);
-  softPwmCreate (PIN_Eye1_G, 0, 100);
-  softPwmCreate (PIN_Eye1_B, 0, 100);
-  softPwmCreate (PIN_Eye2_R, 0, 100);
-  softPwmCreate (PIN_Eye2_G, 0, 100);
-  softPwmCreate (PIN_Eye2_B, 0, 100);  
+  softPwmCreate (PIN_Eye1_R, 100, 100);
+  softPwmCreate (PIN_Eye1_G, 100, 100);
+  softPwmCreate (PIN_Eye1_B, 100, 100);
+  softPwmCreate (PIN_Eye2_R, 100, 100);
+  softPwmCreate (PIN_Eye2_G, 100, 100);
+  softPwmCreate (PIN_Eye2_B, 100, 100);  
 }
 
 // These setFoo functions set the colours of my LEDs two at a time- I'm using these LEDs for a custom Nina
 void setRed(int percent) {
   // TODO attenuation
-  softPWMWrite();
+  // clamp the value (prolly redundant)
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+  softPWMWrite(PIN_Eye1_R,100-percent);
+  softPWMWrite(PIN_Eye2_R,100-percent);
 }
 
 void setGrn(int percent) {
-
-
+  // clamp the value (prolly redundant)
+  //if (percent < 0) percent = 0;
+  //if (percent > 100) percent = 100;
+  softPWMWrite(PIN_Eye1_G,100-percent);
+  softPWMWrite(PIN_Eye2_G,100-percent);
 }
 
 void setBlu(int percent) {
-
-
+  // clamp the value (prolly redundant)
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+  softPWMWrite(PIN_Eye1_B,100-percent);
+  softPWMWrite(PIN_Eye2_B,100-percent);
 }
+
+void setGrey(int percent) {
+  setRed(percent);
+  setGrn(percent);
+  setBlu(percent);
+}
+
+/////////////////////////////////////
+// Misc binary actuators
+void initLightSabre() {
+  pinMode(PIN_Lightsabre, OUTPUT);
+}
+
+void LightSabreOn() {
+  digitalWrite(PIN_Lightsabre, 1);
+}
+
+void LightSabreOff() {
+  digitalWrite(PIN_Lightsabre, 0);
+}
+
+void initHomer() {
+  pinMode(PIN_Homer, OUTPUT);
+}
+
+void HomerOn() {
+  digitalWrite(PIN_Homer, 1);
+}
+
+void HomerOff() {
+  digitalWrite(PIN_Homer, 0);
+}
+
+void initBridalMarch() {
+  pinMode(PIN_BridalMarch, OUTPUT);
+}
+
+void bridalMarchOn() {
+  digitalWrite(PIN_BridalMarch, 1); 
+}
+
+void bridalMarchOff() {
+  digitalWrite(PIN_BridalMarch, 0);  
+}
+
+void initMotor() {
+  // DC Motors can handle a wee bit of PWM
+  softPWMCreate(PIN_Motor, 0, 100);
+}
+
+void motorOn() {
+  softPWMWrite(PIN_Motor, 100);
+}
+
+void motorOff() {
+  softPWMWrite(PIN_Motor, 0);
+}
+
+void setMotor(int percentage) {
+  softPWMWrite(PIN_Motor, percent);
+}
+
+
+
