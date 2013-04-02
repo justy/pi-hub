@@ -1,4 +1,4 @@
-#pi-hub actuator hub
+#pi-hub actuator hub (incomplete)
 
 A fun hack on a long weekend.  I've attached:
 
